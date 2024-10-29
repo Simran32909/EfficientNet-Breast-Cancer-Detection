@@ -18,12 +18,15 @@ This project aims to develop a deep learning model for breast cancer detection u
 - **K-Fold Cross-Validation**: Allows for robust model validation by splitting the dataset into multiple folds.
 
 ## Requirements
-- Python 3.6 or higher
+- Python 3.9 or higher
 - PyTorch
 - torchvision
 - seaborn
 - tqdm
 - scikit-learn
+- streamlit
+- numpy
+- matplotlib
 
 ## Installation
 1. Clone the repository:
@@ -71,6 +74,11 @@ This project aims to develop a deep learning model for breast cancer detection u
    ```bash
    python src/train.py
 
+4. Run the Streamlit application:
+   ```bash
+   cd streamlit
+   streamlit run app.py   
+
 ## Model Evaluation
 After training, the model's performance will be evaluated using various metrics. The following metrics will be displayed:
 - Accuracy
@@ -86,3 +94,5 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 - [PyTorch](https://pytorch.org/)
 - [Seaborn](https://seaborn.pydata.org/)
 - [ResNet](https://arxiv.org/abs/1512.03385)
+- [Streamlit](https://streamlit.io/)
+
