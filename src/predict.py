@@ -1,16 +1,13 @@
 import torch
-from torchvision import transforms
 from PIL import Image
-import os
-from src.model import EnhancedCNN
+import torchvision.transforms as transforms
+from model import EnhancedCNN
 
-def load_model(model_path):
+def predict(image_path):
     model = EnhancedCNN()
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load('models/cnn_model.pth'))
     model.eval()
-    return model
 
-def predict_image(model, image_path):
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
@@ -26,15 +23,6 @@ def predict_image(model, image_path):
 
     return predicted.item()
 
-def main():
-    model_path = r'D:\JetBrains\PyCharm Professional\MediPrediction\models\cnn_model.pth'
-    image_path = r'D:\JetBrains\PyCharm Professional\MediPrediction\data\val\malignant\malignant (6).png'
-
-    model = load_model(model_path)
-    prediction = predict_image(model, image_path)
-
-    class_names = ['Normal', 'Benign', 'Malignant']
-    print(f"Prediction: {class_names[prediction]}")
-
 if __name__ == "__main__":
-    main()
+    result = predict(r'D:\JetBrains\PyCharm Professional\MediPrediction\data\train\malignant\malignant (5).png')
+    print(f'Predicted class: {result}')
