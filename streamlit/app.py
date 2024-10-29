@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.model import EnhancedCNN
 
 model = EnhancedCNN()
-model.load_state_dict(torch.load(r'D:\JetBrains\PyCharm Professional\MediPrediction\models\cnn_model.pth'))
+model.load_state_dict(torch.load(r'D:\JetBrains\PyCharm Professional\MediPrediction\src\src\models\cnn_model.pth'))
 model.eval()
 
 cancer_info = {

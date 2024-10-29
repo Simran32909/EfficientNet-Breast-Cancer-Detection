@@ -6,7 +6,7 @@ import torch.nn as nn
 def test():
     test_loader = get_data_loaders(batch_size=32)[1]
     model = EnhancedCNN()
-    model.load_state_dict(torch.load(r'D:\JetBrains\PyCharm Professional\MediPrediction\models\cnn_model.pth'))
+    model.load_state_dict(torch.load(r'D:\JetBrains\PyCharm Professional\MediPrediction\src\src\models\cnn_model.pth'))
     model.eval()
 
     correct = 0

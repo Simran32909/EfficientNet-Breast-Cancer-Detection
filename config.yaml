@@ -1,0 +1,26 @@
+dataset:
+  path: "data/dataset.pgm"
+  train_ratio: 0.8
+  val_ratio: 0.2
+  image_size: [224, 224]
+  num_classes: 3
+
+model:
+  name: "EnhancedCNN"
+  pretrained: true
+  num_epochs: 15
+  learning_rate: 0.001
+  batch_size: 32
+
+training:
+  device: "cuda"
+  optimizer: "adam"
+  criterion: "cross_entropy"
+
+logging:
+  level: "INFO"
+  log_file: "logs/training.log"
+
+output:
+  model_dir: "src/models"
+  confusion_matrix_image: "outputs/confusion_matrix.png"
