@@ -9,7 +9,6 @@ This project aims to develop a deep learning model for breast cancer detection u
 - [Installation](#installation)
 - [Usage](#usage)
 - [Model Evaluation](#model-evaluation)
-- [Results](#results)
 - [License](#license)
 
 ## Features
@@ -31,3 +30,59 @@ This project aims to develop a deep learning model for breast cancer detection u
    ```bash
    git clone https://github.com/Simran32909/breast-cancer-detection.git
    cd breast-cancer-detection
+
+2. Create a virtual environment and activate it:
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate
+
+3. Install the required packages:
+   ```bash
+   pip install -r requirements.txt
+
+## Usage
+1. Prepare your dataset in the format expected by ImageFolder. The directory structure should look like this:
+   ```bash
+   data/
+    train/
+        Normal/
+            image1.jpg
+            image2.jpg
+        Benign/
+            image1.jpg
+            image2.jpg
+        Malignant/
+            image1.jpg
+            image2.jpg
+    val/
+        Normal/
+            image1.jpg
+            image2.jpg
+        Benign/
+            image1.jpg
+            image2.jpg
+        Malignant/
+            image1.jpg
+            image2.jpg
+
+2. Update the data_loader.py file with the correct paths for your dataset.
+
+3. Run the training script:
+   ```bash
+   python src/train.py
+
+## Model Evaluation
+After training, the model's performance will be evaluated using various metrics. The following metrics will be displayed:
+- Accuracy
+- Precision
+- Recall
+- F1 Score
+- Confusion Matrix Visualization
+
+## License
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+## Acknowledgments
+- [PyTorch](https://pytorch.org/)
+- [Seaborn](https://seaborn.pydata.org/)
+- [ResNet](https://arxiv.org/abs/1512.03385)
