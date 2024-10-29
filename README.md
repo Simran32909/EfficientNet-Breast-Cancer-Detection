@@ -28,8 +28,8 @@ This project aims to develop a deep learning model for breast cancer detection u
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Simran32909/breast-cancer-detection.git
-   cd breast-cancer-detection
+   git clone https://github.com/Simran32909/enhanced-cnn-breast-cancer-detection.git
+   cd enhanced-cnn-breast-cancer-detection
 
 2. Create a virtual environment and activate it:
    ```bash
