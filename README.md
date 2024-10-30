@@ -96,3 +96,4 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 - [ResNet](https://arxiv.org/abs/1512.03385)
 - [Streamlit](https://streamlit.io/)
 
+## Developed by Simran Singh
