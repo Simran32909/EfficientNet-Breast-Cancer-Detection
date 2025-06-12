@@ -1,4 +1,4 @@
-# Enhanced CNN for Breast Cancer Detection
+# EfficientNet Breast Cancer Detection
 
 This project uses a deep learning model to classify breast ultrasound images as Normal, Benign, or Malignant.
 
