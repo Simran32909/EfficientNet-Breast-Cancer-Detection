@@ -1,58 +1,68 @@
 import streamlit as st
 from PIL import Image
-import torch
-from torchvision import transforms
 import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from src.model import EnhancedCNN
+from src.predict import load_model, predict_image
+from src import config
 
-model = EnhancedCNN()
-model.load_state_dict(torch.load(r'D:\JetBrains\PyCharm Professional\MediPrediction\src\src\models\cnn_model.pth'))
-model.eval()
+# --- Helper Functions ---
+@st.cache_resource
+def load_cached_model(model_path):
+    """Load and cache the model."""
+    return load_model(model_path)
 
+def load_class_names(classes_path):
+    """Load class names from a file."""
+    with open(classes_path, 'r') as f:
+        class_names = [line.strip() for line in f.readlines()]
+    return class_names
+
+# --- Load Model and Classes ---
+try:
+    model = load_cached_model(config.MODEL_PATH)
+    class_names = load_class_names(config.CLASSES_PATH)
+except FileNotFoundError:
+    st.error(f"Error: Model or class names file not found. Please run the training script first.")
+    st.stop()
+
+# --- Page Content ---
 cancer_info = {
     "normal": {
-        "description": "Normal tissue with no cancer.",
-        "symptoms": "No symptoms.",
-        "treatment": "No treatment required."
+        "description": "Normal tissue with no signs of cancer.",
+        "symptoms": "No specific symptoms related to breast cancer.",
+        "treatment": "No treatment required. Regular check-ups are recommended."
     },
     "benign": {
-        "description": "Benign tumors are non-cancerous growths.",
-        "symptoms": "Can cause discomfort depending on location.",
-        "treatment": "Surgery may be required."
+        "description": "A benign tumor is a non-cancerous growth. It does not spread to other parts of the body.",
+        "symptoms": "May cause a lump, pain, or discomfort depending on its size and location.",
+        "treatment": "Often does not require treatment. Surgery may be performed to remove it if it causes symptoms."
     },
     "malignant": {
-        "description": "Malignant tumors are cancerous and can spread.",
-        "symptoms": "Unexplained weight loss, fatigue, pain, etc.",
-        "treatment": "Chemotherapy, radiation, surgery."
+        "description": "A malignant tumor is cancerous. It can invade nearby tissues and spread to other parts of the body.",
+        "symptoms": "A new lump or mass, swelling, skin dimpling, nipple retraction, unexplained weight loss.",
+        "treatment": "Treatment depends on the stage and type of cancer, and may include surgery, chemotherapy, radiation therapy, and hormone therapy."
     }
 }
 
-def predict(image):
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
-    image = transform(image).unsqueeze(0)
-    with torch.no_grad():
-        outputs = model(image)
-        _, predicted = torch.max(outputs, 1)
-    return predicted.item()
+st.title("Breast Cancer Detection from Ultrasound Images")
 
-st.title("Breast Cancer Detection")
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Choose an ultrasound image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file)
+    image = Image.open(uploaded_file).convert('RGB')
     st.image(image, caption='Uploaded Image', use_column_width=True)
-    st.write("")
-    st.write("Classifying...")
-    class_index = predict(image)
-    class_names = ['Normal', 'Benign', 'Malignant']
-    st.write(f"Prediction: {class_names[class_index]}")
-    st.write("Description: ", cancer_info[class_names[class_index].lower()]["description"])
-    st.write("Symptoms: ", cancer_info[class_names[class_index].lower()]["symptoms"])
-    st.write("Treatment: ", cancer_info[class_names[class_index].lower()]["treatment"])
+    
+    with st.spinner("Classifying..."):
+        prediction = predict_image(model, image, class_names)
+    
+    st.success(f"Prediction: **{prediction}**")
+    
+    info = cancer_info.get(prediction.lower(), {})
+    if info:
+        st.write("---")
+        st.write(f"### More about {prediction}")
+        st.write(f"**Description:** {info['description']}")
+        st.write(f"**Common Symptoms:** {info['symptoms']}")
+        st.write(f"**Typical Treatment:** {info['treatment']}")
