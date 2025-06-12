@@ -31,7 +31,7 @@ pip install -r requirements.txt
 ### 3. Prepare and Split the Dataset
 This script splits the raw images from the `dataset` folder into `train`, `val`, and `test` sets, placing them in a new `data_processed` directory.
 ```bash
-python prepare_dataset.py
+python src/prepare_dataset.py
 ```
 
 ### 4. Train the Model
