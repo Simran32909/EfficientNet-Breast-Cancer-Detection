@@ -1,97 +1,53 @@
-# Breast Cancer Detection Using Enhanced CNN with Attention Mechanism
+# Enhanced CNN for Breast Cancer Detection
 
-## Overview
-This project aims to develop a deep learning model for breast cancer detection using images. It employs a Convolutional Neural Network (CNN) based on the ResNet-18 architecture, enhanced with an attention mechanism to improve feature extraction and classification performance. The model is trained to classify images into three categories: Normal, Benign, and Malignant.
+This project uses a deep learning model to classify breast ultrasound images as Normal, Benign, or Malignant.
 
-## Table of Contents
-- [Features](#features)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Model Evaluation](#model-evaluation)
-- [License](#license)
+## How to Run the Pipeline
 
-## Features
-- **Data Loading**: Utilizes PyTorch's `ImageFolder` to load training and validation datasets.
-- **Model Architecture**: Incorporates ResNet-18 as a backbone with an attention mechanism for better feature learning.
-- **Training and Evaluation**: Implements a training loop with evaluation metrics such as accuracy, precision, recall, F1 score, and confusion matrix visualization.
-- **K-Fold Cross-Validation**: Allows for robust model validation by splitting the dataset into multiple folds.
+Follow these steps from the root directory of the project.
 
-## Requirements
-- Python 3.9 or higher
-- PyTorch
-- torchvision
-- seaborn
-- tqdm
-- scikit-learn
-- streamlit
-- numpy
-- matplotlib
+### 1. Download the Dataset
 
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Simran32909/enhanced-cnn-breast-cancer-detection.git
-   cd enhanced-cnn-breast-cancer-detection
+The model is trained on the Breast Ultrasound Images Dataset.
+- **Download Link:** [https://www.kaggle.com/datasets/aryashah2k/breast-ultrasound-images-dataset?resource=download](https://www.kaggle.com/datasets/aryashah2k/breast-ultrasound-images-dataset?resource=download)
 
-2. Create a virtual environment and activate it:
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate
+After downloading, unzip the folder and place its contents into a directory named `dataset` in the root of this project. The structure should look like this:
+```
+/enhanced-cnn-breast-cancer-detection
+|-- /dataset
+|   |-- /benign
+|   |-- /malignant
+|   |-- /normal
+|-- /src
+...
+```
 
-3. Install the required packages:
-   ```bash
-   pip install -r requirements.txt
+### 2. Install Dependencies
+Install all the required Python packages.
+```bash
+pip install -r requirements.txt
+```
 
-## Usage
-1. Prepare your dataset in the format expected by ImageFolder. The directory structure should look like this:
-   ```bash
-   data/
-    train/
-        Normal/
-            image1.jpg
-            image2.jpg
-        Benign/
-            image1.jpg
-            image2.jpg
-        Malignant/
-            image1.jpg
-            image2.jpg
-    val/
-        Normal/
-            image1.jpg
-            image2.jpg
-        Benign/
-            image1.jpg
-            image2.jpg
-        Malignant/
-            image1.jpg
-            image2.jpg
+### 3. Prepare and Split the Dataset
+This script splits the raw images from the `dataset` folder into `train`, `val`, and `test` sets, placing them in a new `data_processed` directory.
+```bash
+python prepare_dataset.py
+```
 
-2. Update the data_loader.py file with the correct paths for your dataset.
+### 4. Train the Model
+Run the training script. This will train the model using the settings in `src/config.py` and save the final model to `src/models/cnn_model.pth`.
+```bash
+python src/train.py
+```
 
-3. Run the training script:
-   ```bash
-   python src/train.py
+### 5. Evaluate the Model (Optional)
+To see the model's performance on the test set, run the test script.
+```bash
+python src/test.py
+```
 
-4. Run the Streamlit application:
-   ```bash
-   cd streamlit
-   streamlit run app.py   
-
-## Model Evaluation
-After training, the model's performance will be evaluated using various metrics. The following metrics will be displayed:
-- Accuracy
-- Precision
-- Recall
-- F1 Score
-- Confusion Matrix Visualization
-
-## License
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
-
-## Acknowledgments
-- [PyTorch](https://pytorch.org/)
-- [Seaborn](https://seaborn.pydata.org/)
-- [ResNet](https://arxiv.org/abs/1512.03385)
-- [Streamlit](https://streamlit.io/)
+### 6. Run the Web Application
+Launch the interactive Streamlit app to make predictions on your own images.
+```bash
+streamlit run streamlit/app.py
+```
