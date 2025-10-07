@@ -14,7 +14,7 @@ CLASSES_PATH = f"{MODEL_DIR}/class_names.txt"
 # Choose from 'resnet18', 'resnet34', 'resnet50', 'efficientnet_b0'
 BACKBONE = 'efficientnet_b0' 
 NUM_CLASSES = 3 # Number of output classes (e.g., Normal, Benign, Malignant)
-PRETRAINED = True # Use pretrained weights from ImageNet
+PRETRAINED = False # Use pretrained weights from ImageNet
 
 # --- Training Hyperparameters ---
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"

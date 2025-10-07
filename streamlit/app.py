@@ -5,7 +5,7 @@ import os
 import requests
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from src.predict import load_model, predict_image
+from src.predict import load_model, predict_image_with_confidence, topk_from_last
 from src import config
 
 # --- Model/Classes availability helpers ---
@@ -13,6 +13,7 @@ def ensure_model_present():
     os.makedirs(os.path.dirname(config.MODEL_PATH), exist_ok=True)
     if not os.path.exists(config.MODEL_PATH):
         model_url = os.environ.get("MODEL_URL")
+        st.info(f"Downloading from: {os.environ.get('MODEL_URL')!r}")
         if not model_url:
             st.error("MODEL_URL is not set. Configure it in deployment secrets.")
             st.stop()
@@ -87,6 +88,8 @@ cancer_info = {
 }
 
 st.title("Breast Cancer Detection from Ultrasound Images")
+st.sidebar.header("Settings")
+threshold = st.sidebar.slider("Confidence threshold", min_value=0.0, max_value=1.0, value=0.6, step=0.01)
 
 uploaded_file = st.file_uploader("Choose an ultrasound image...", type=["jpg", "jpeg", "png"])
 
@@ -95,14 +98,25 @@ if uploaded_file is not None:
     st.image(image, caption='Uploaded Image', use_container_width=True)
     
     with st.spinner("Classifying..."):
-        prediction = predict_image(model, image, class_names)
+        pred_label, pred_conf = predict_image_with_confidence(model, image, class_names)
+
+    if pred_conf < threshold:
+        st.warning(f"Uncertain / possibly out-of-distribution. Top-1 confidence {pred_conf:.2f} < threshold {threshold:.2f}")
+    else:
+        st.success(f"Prediction: **{pred_label}** (confidence {pred_conf:.2f})")
+
+    # Show top-3 breakdown to aid debugging
+    top3 = topk_from_last(model, k=3)
+    if top3:
+        st.write("Top-3:")
+        for cls, prob in top3:
+            st.write(f"- {cls}: {prob:.2f}")
     
-    st.success(f"Prediction: **{prediction}**")
-    
-    info = cancer_info.get(prediction.lower(), {})
-    if info:
-        st.write("---")
-        st.write(f"### More about {prediction}")
-        st.write(f"**Description:** {info['description']}")
-        st.write(f"**Common Symptoms:** {info['symptoms']}")
-        st.write(f"**Typical Treatment:** {info['treatment']}")
+    if pred_conf >= threshold:
+        info = cancer_info.get(pred_label.lower(), {})
+        if info:
+            st.write("---")
+            st.write(f"### More about {pred_label}")
+            st.write(f"**Description:** {info['description']}")
+            st.write(f"**Common Symptoms:** {info['symptoms']}")
+            st.write(f"**Typical Treatment:** {info['treatment']}")
