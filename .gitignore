@@ -114,9 +114,21 @@ venv.bak/
 /data_processed/
 
 # Trained models and class mappings
-/src/models/
+/src/models/cnn_model.pth
 
 # Temporary files if any
 temp_images/
 count_files.py
 *.log
+
+# Generated plots and logs
+/outputs/
+/logs/
+
+# Raw datasets (large, not for Git)
+/dataset/
+/Dataset_BUSI_with_GT/
+
+src/prepare_dataset.py
+src/prepare_busi.py
+

@@ -26,41 +26,60 @@ class Attention(nn.Module):
 class EnhancedCNN(nn.Module):
     def __init__(self, num_classes=config.NUM_CLASSES, backbone_name=config.BACKBONE):
         super(EnhancedCNN, self).__init__()
-        
-        # Dynamically load the specified backbone
+
+        # Select weights enums (torchvision >= 0.13) when pretrained is requested
+        weights = None
+        if config.PRETRAINED:
+            if backbone_name == 'resnet18':
+                weights = models.ResNet18_Weights.DEFAULT
+            elif backbone_name == 'resnet34':
+                weights = models.ResNet34_Weights.DEFAULT
+            elif backbone_name == 'resnet50':
+                weights = models.ResNet50_Weights.DEFAULT
+            elif backbone_name == 'efficientnet_b0':
+                weights = models.EfficientNet_B0_Weights.DEFAULT
+
+        # Build backbone to output convolutional feature maps (N, C, H, W)
+        def build_with_fallback(builder, *b_args, **b_kwargs):
+            try:
+                return builder(*b_args, **b_kwargs)
+            except Exception:
+                # Fallback to no pretrained weights if download/cache is corrupted
+                b_kwargs = dict(b_kwargs)
+                if 'weights' in b_kwargs:
+                    b_kwargs['weights'] = None
+                return builder(*b_args, **b_kwargs)
+
         if backbone_name == 'resnet18':
-            self.resnet = models.resnet18(pretrained=config.PRETRAINED)
+            base = build_with_fallback(models.resnet18, weights=weights)
+            # take layers up to conv feature maps (exclude avgpool and fc)
+            self.backbone = nn.Sequential(*list(base.children())[:-2])
             num_features = 512
         elif backbone_name == 'resnet34':
-            self.resnet = models.resnet34(pretrained=config.PRETRAINED)
+            base = build_with_fallback(models.resnet34, weights=weights)
+            self.backbone = nn.Sequential(*list(base.children())[:-2])
             num_features = 512
         elif backbone_name == 'resnet50':
-            self.resnet = models.resnet50(pretrained=config.PRETRAINED)
+            base = build_with_fallback(models.resnet50, weights=weights)
+            self.backbone = nn.Sequential(*list(base.children())[:-2])
             num_features = 2048
-            self.resnet.fc = nn.Identity()
         elif backbone_name == 'efficientnet_b0':
-            self.resnet = models.efficientnet_b0(pretrained=config.PRETRAINED)
-            # The classifier in EfficientNet is a single Linear layer
-            num_features = self.resnet.classifier[1].in_features
-            # We replace it with our own attention and classifier head
-            self.resnet.classifier = nn.Identity()
+            base = build_with_fallback(models.efficientnet_b0, weights=weights)
+            # use convolutional feature extractor; returns spatial maps
+            self.backbone = base.features
+            num_features = 1280
         else:
             raise ValueError("Unsupported backbone! Choose from 'resnet18', 'resnet34', 'resnet50', 'efficientnet_b0'.")
 
         self.attention = Attention(num_features)
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc1 = nn.Linear(num_features, 256)
         self.fc2 = nn.Linear(256, num_classes)
 
     def forward(self, x):
-        features = self.resnet(x)
-        
-        # Reshape features to be compatible with the attention layer's expected input
-        # Input to attention should be (batch_size, channels, height, width)
-        # ResNet output is already in this format, but EfficientNet is (batch_size, features)
-        if 'efficientnet' in self.resnet.__class__.__name__.lower():
-            features = features.view(features.size(0), -1, 1, 1)
-
+        features = self.backbone(x)  # (N, C, H, W)
         x = self.attention(features)
+        x = self.global_pool(x)  # (N, C, 1, 1)
         x = x.view(x.size(0), -1)
         x = F.relu(self.fc1(x))
         x = self.fc2(x)

@@ -18,12 +18,15 @@ PRETRAINED = True # Use pretrained weights from ImageNet
 
 # --- Training Hyperparameters ---
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-EPOCHS = 150
-BATCH_SIZE = 32
+EPOCHS = 200
+BATCH_SIZE = 512
 LEARNING_RATE = 0.001
+WEIGHT_DECAY = 1e-4
+FREEZE_EPOCHS = 2  # Freeze backbone for first N epochs
+USE_AMP = True  # Enable mixed precision if CUDA is available
 
 # --- Early Stopping ---
-EARLY_STOPPING_PATIENCE = 5  # Num epochs to wait for improvement before stopping
+EARLY_STOPPING_PATIENCE = 50  # Num epochs to wait for improvement before stopping
 EARLY_STOPPING_MIN_DELTA = 0.001 # Min change in validation loss to be considered an improvement
 
 # --- Image Transformations ---
@@ -31,3 +34,6 @@ IMAGE_SIZE = (224, 224)
 # Mean and std for ImageNet normalization
 NORMALIZE_MEAN = [0.485, 0.456, 0.406]
 NORMALIZE_STD = [0.229, 0.224, 0.225] 
+
+# --- Outputs ---
+OUTPUTS_DIR = "outputs"

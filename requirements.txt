@@ -7,3 +7,5 @@ seaborn==0.13.0
 matplotlib==3.8.1
 tqdm==4.66.1
 Pillow==10.1.0
+rich==13.7.1
+requests==2.31.0
